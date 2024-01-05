@@ -11,6 +11,7 @@ namespace RTCV.Launcher
     using System.Threading.Tasks;
     using System.Windows.Forms;
     using RTCV.Launcher.Components;
+    using RTCV.Launcher.Exceptions;
 
     internal partial class VersionDownloadPanel : Form
     {
@@ -62,17 +63,24 @@ namespace RTCV.Launcher
 
             //checking unstable
             string versionsDir = Path.Combine(MainForm.launcherDir, "VERSIONS");
-            var versions = Directory.GetDirectories(versionsDir);
-            string unstableDir = Path.Combine(MainForm.launcherDir, "VERSIONS", "UNSTABLE");
+            try
+            {
+                var versions = Directory.GetDirectories(versionsDir);
+                string unstableDir = Path.Combine(MainForm.launcherDir, "VERSIONS", "UNSTABLE");
+                if (!Directory.Exists(unstableDir) && versions.Length > 0)
+                {
+                    btnDevUnstable.Visible = true;
+                }
+                else
+                {
+                    btnDevUnstable.Visible = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.CatchException(0, versionsDir, ex);
+            }
 
-            if (!Directory.Exists(unstableDir) && versions.Length > 0)
-            {
-                btnDevUnstable.Visible = true;
-            }
-            else
-            {
-                btnDevUnstable.Visible = false;
-            }
 
             refreshVersions();
             MainForm.mf.RefreshMotd();
